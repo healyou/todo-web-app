@@ -34,9 +34,6 @@
               >
               <div class="invalid-feedback">{{ getConfirmPasswordErrorText() }}</div>
             </div>
-            <div v-if="hasLoginOrRegisterError" class="alert alert-danger" role="alert">
-              {{ loginOrRegisterErrorText }}
-            </div>
             <div class="mb-3">
               <button
                   :disabled='loginOrRegisterLoading'
@@ -72,9 +69,13 @@
 
 <script>
 import {authService} from "@/service/authservice";
+import {showToastMixin} from "@/components/mixins/showToastMixin";
 
 export default {
   name: 'HelloWorld',
+  mixins: [
+      showToastMixin
+  ],
   data: function () {
     return {
       loginActive: true,
@@ -85,9 +86,7 @@ export default {
       validatePassword: false,
       confirmPassword: "",
       validateConfirmPassword: false,
-      loginOrRegisterLoading: false,
-      hasLoginOrRegisterError: false,
-      loginOrRegisterErrorText: ""
+      loginOrRegisterLoading: false
     }
   },
   methods: {
@@ -130,8 +129,6 @@ export default {
       this.validateUsername = false
       this.validatePassword = false
       this.validateConfirmPassword = false
-      this.hasLoginOrRegisterError = false
-      this.loginOrRegisterErrorText = ""
     },
     isValidPassword: function(password) {
       return password.length >= 4
@@ -161,8 +158,7 @@ export default {
         await authService.login(this.username, this.password)
         await this.$router.push("/")
       } catch (e) {
-        this.loginOrRegisterErrorText = e
-        this.hasLoginOrRegisterError = true
+        this.showUnexpectedErrorToast(e)
       } finally {
         this.loginOrRegisterLoading = false
       }
@@ -172,8 +168,7 @@ export default {
         this.loginOrRegisterLoading = true
         await authService.register(this.username, this.password)
       } catch (e) {
-        this.loginOrRegisterErrorText = e
-        this.hasLoginOrRegisterError = true
+        this.showUnexpectedErrorToast(e)
       } finally {
         this.loginOrRegisterLoading = false
       }

@@ -1,18 +1,20 @@
 import { createStore } from 'vuex'
-import {SET_AUTH_DATA} from "@/configuration/store/mutation-types";
+import {ADD_TOAST, REMOVE_TOAST_BY_UUID} from "@/configuration/store/mutation-types";
 
 export default createStore({
     state () {
         return {
-            authData: null
+            toasts: []
         }
     },
-    getters: {
-        authData: state => state.authData
-    },
     mutations: {
-        [SET_AUTH_DATA] (state, authData) {
-            state.authData = authData
+        [ADD_TOAST] (state, toast) {
+            state.toasts.push(toast)
+        },
+        [REMOVE_TOAST_BY_UUID] (state, uuid) {
+            state.toasts = state.toasts.filter(function( it ) {
+                return it.uuid !== uuid;
+            });
         }
     }
 })

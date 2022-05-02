@@ -79,13 +79,8 @@
                href="#"
                v-on:click.stop.prevent="logout()"
             >
-              Sign out
+              Выход
             </a>
-          </li>
-          <li>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-              Launch demo modal
-            </button>
           </li>
         </ul>
       </div>
@@ -113,18 +108,28 @@
 
 <script>
 import {authService} from "@/service/authservice";
+import { mapMutations } from 'vuex'
+import {ADD_TOAST} from "@/configuration/store/mutation-types";
+import {showToastMixin} from "@/components/mixins/showToastMixin";
 
 export default {
   name: 'HelloWorld',
+  mixins: [
+      showToastMixin
+  ],
   methods: {
+    ...mapMutations({
+      addToast: ADD_TOAST
+    }),
     async logout() {
       try {
         await authService.logout()
-        await this.$router.push("/login")
       } catch (e) {
-        console.log(e)
+        // TODO - загрузка списка заметок
+        this.showUnexpectedErrorToast(e)
       } finally {
-        this.loginOrRegisterLoading = false
+        /* Веб часть зависит от куки auth - она точно удаляется */
+        await this.$router.push("/login")
       }
     }
   }

@@ -57,6 +57,10 @@ class AuthService {
         return response.data
     }
     async logout() {
+        /* Вначале удаляем куки */
+        localStorage.removeItem(LS_AUTH_DATA_KEY)
+
+        /* Затем выходим из rest */
         const authData = JSON.parse(localStorage[LS_AUTH_DATA_KEY])
         const logoutUrl = WEB_API_BASE_URL + WEB_API_LOGOUT_PATH
         const config = {
@@ -67,13 +71,7 @@ class AuthService {
                 [WEB_API_REFRESH_TOKEN_HEADER_CODE]: `${authData[AUTH_DATA_REFRESH_TOKEN_VALUE_NAME]}`
             }
         };
-        /* only 200 status */
-        try {
-            await axios(config)
-        } catch (e) {
-            console.log("Ошибка в процессе выхода из приложения", e)
-        }
-        localStorage.removeItem(LS_AUTH_DATA_KEY)
+        await axios(config)
     }
 }
 

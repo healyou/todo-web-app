@@ -6,6 +6,7 @@
       <div class="col py-3">
         <router-view/>
       </div>
+      <ToastContainer/>
 
     </div>
   </div>
@@ -13,11 +14,13 @@
 
 <script>
 import Sidebar from "@/components/Sidebar";
+import ToastContainer from "@/components/ToastContainer";
 
 export default {
   name: 'App',
   components: {
-    Sidebar
+    Sidebar,
+    ToastContainer
   },
   computed:{
     isShowSidebar(){
