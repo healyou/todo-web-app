@@ -27,7 +27,9 @@ router.beforeEach((to, from, next) => {
     const authRequired = !publicPages.includes(to.path)
     const authData = localStorage[LS_AUTH_DATA_KEY]
 
-    if (authRequired && !authData) {
+    if (to.path === '/login' && authData) {
+        return next('/')
+    } else if (authRequired && !authData) {
         return next('/login');
     }
 

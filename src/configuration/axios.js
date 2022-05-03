@@ -1,5 +1,11 @@
 import axios from "axios";
 import {LS_AUTH_DATA_KEY} from "@/const/localstorage";
+import {AUTH_DATA_ACCESS_TOKEN_VALUE_NAME, WEB_API_ACCESS_TOKEN_HEADER_CODE} from "@/const/api";
+import {authService} from "@/service/authservice";
+import {router} from "@/configuration/router";
+import store from "@/configuration/store/store";
+import {ADD_TOAST} from "@/configuration/store/mutation-types";
+import {Toast} from "@/entity/toast";
 
 export const axiosInstance = axios.create({
     baseURL: 'http://localhost:8080/todo-web-api',
@@ -9,36 +15,43 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     config => {
-        const authData = localStorage[LS_AUTH_DATA_KEY]
+        const authData = JSON.parse(localStorage[LS_AUTH_DATA_KEY])
         if (authData !== null) {
-            config.headers['X-Access-Token'] = `${authData['access_token']}`
+            config.headers[WEB_API_ACCESS_TOKEN_HEADER_CODE] = `${authData[AUTH_DATA_ACCESS_TOKEN_VALUE_NAME]}`
         }
         return config;
     },
     error => {
-        Promise.reject(error)
+        return Promise.reject(error)
     });
 
-axiosInstance.interceptors.response.use((response) => {
-    return response
-}, async function (error) {
-    // TODO при ошибке авторизации обновить токен и повторить запрос
-    // const originalRequest = error.config;
-    // if (error.response.status === 403 && !originalRequest._retry) {
-    //     originalRequest._retry = true;
-    //     const access_token = await refreshAccessToken();
-    //     axios.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
-    //     return axiosInstance(originalRequest);
-    // }
-    return Promise.reject(error);
-});
+axiosInstance.interceptors.response.use(
+    (response) => {
+        return response
+    },
+    async function (error) {
+        const requestConfig = error.config
+        if (error.response.status === 401 && !requestConfig._retry) {
+            requestConfig._retry = true
+            try {
+                await authService.refreshToken()
+            } catch (e) {
+                addTokenExpiredErrorToast()
+                error.isAlreadyAddedToast = true
+                localStorage.removeItem(LS_AUTH_DATA_KEY)
+                await router.push("/login")
+                return Promise.resolve(error)
+            }
+            return axiosInstance(requestConfig)
+        }
+        return Promise.reject(error);
+    }
+);
 
-// async function refreshAccessToken() {
-//     const value = '{\n' +
-//         '    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidXNlcl9pZCI6MSwicHJpdmlsZWdlcyI6WyJWSUVXX05PVEVfVkVSU0lPTl9ISVNUT1JZIiwiQ0hBTkdFX05PVEVfVkVSU0lPTiIsIkNSRUFURV9OT1RFIl0sImV4cCI6MTY1MDc0MDk0Mn0.a9X-mqrR-8lzixgi-ou6ZNIWDDkF5QawV-U-tgpaUMc",\n' +
-//         '    "access_token_expired_time_utc": "04.23.2022 19:09:02 +0300",\n' +
-//         '    "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwidXNlcl9pZCI6MSwicHJpdmlsZWdlcyI6WyJWSUVXX05PVEVfVkVSU0lPTl9ISVNUT1JZIiwiQ0hBTkdFX05PVEVfVkVSU0lPTiIsIkNSRUFURV9OT1RFIl0sInV1aWQiOiI5YmNhNDllZi1hYzMzLTQzMWUtODMyYS05M2Q3OTZkYmZiOTgiLCJleHAiOjE2NTA4MjU1NDJ9.TYgUVegJh34HLNcny2IObFRzWXf48FvSiE0m52YQRMs"\n' +
-//         '}'
-//     const keys = JSON.parse(value)
-//     return keys.access_token
-// }
+function addTokenExpiredErrorToast() {
+    const toast = new Toast(
+        "Внимание",
+        "Истёк срок действия сессии. Необходимо выполнить повторный вход."
+    )
+    store.commit(ADD_TOAST, toast)
+}

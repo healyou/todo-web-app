@@ -14,7 +14,7 @@ import {
     CONTENT_TYPE_FORM_URLENCODED,
     WEB_API_ACCESS_TOKEN_HEADER_CODE,
     WEB_API_REFRESH_TOKEN_HEADER_CODE,
-    CONTENT_TYPE_HEADER_NAME
+    CONTENT_TYPE_HEADER_NAME, WEB_API_REFRESH_TOKEN_PATH
 } from "@/const/api";
 
 class AuthService {
@@ -32,6 +32,26 @@ class AuthService {
             data : formData
         };
         /* only 200 status */
+        const response = await axios(config)
+        if (response.data[AUTH_DATA_ACCESS_TOKEN_VALUE_NAME] && response.data[AUTH_DATA_REFRESH_TOKEN_VALUE_NAME]) {
+            localStorage[LS_AUTH_DATA_KEY] = JSON.stringify(response.data)
+        } else {
+            throw new Error('Не получен токен авторизации');
+        }
+    }
+    async refreshToken() {
+        const authData = JSON.parse(localStorage[LS_AUTH_DATA_KEY])
+        const refreshToken = authData[AUTH_DATA_REFRESH_TOKEN_VALUE_NAME]
+        const refreshTokenUrl = WEB_API_BASE_URL + WEB_API_REFRESH_TOKEN_PATH
+
+        const config = {
+            method: POST_METHOD_NAME,
+            url: refreshTokenUrl,
+            headers: {
+                [WEB_API_REFRESH_TOKEN_HEADER_CODE]: `${refreshToken}`
+            }
+        };
+
         const response = await axios(config)
         if (response.data[AUTH_DATA_ACCESS_TOKEN_VALUE_NAME] && response.data[AUTH_DATA_REFRESH_TOKEN_VALUE_NAME]) {
             localStorage[LS_AUTH_DATA_KEY] = JSON.stringify(response.data)

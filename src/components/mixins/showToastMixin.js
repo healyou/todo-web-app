@@ -8,6 +8,10 @@ export const showToastMixin = {
             addToast: ADD_TOAST
         }),
         showUnexpectedErrorToast(error) {
+            if (error.isAlreadyAddedToast) {
+                console.log("В axios была получена и обработана ошибка", error)
+                return
+            }
             const toast = new Toast("Непредвиденная ошибка", error.toString())
             this.addToast(toast)
         }
