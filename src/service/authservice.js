@@ -58,10 +58,10 @@ class AuthService {
     }
     async logout() {
         /* Вначале удаляем куки */
+        const authData = JSON.parse(localStorage[LS_AUTH_DATA_KEY])
         localStorage.removeItem(LS_AUTH_DATA_KEY)
 
         /* Затем выходим из rest */
-        const authData = JSON.parse(localStorage[LS_AUTH_DATA_KEY])
         const logoutUrl = WEB_API_BASE_URL + WEB_API_LOGOUT_PATH
         const config = {
             method: POST_METHOD_NAME,
