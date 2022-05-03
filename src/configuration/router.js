@@ -1,16 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import HomePage from '../components/HomePage'
 import LoginPage from '../components/LoginPage'
 import {LS_AUTH_DATA_KEY} from "@/const/localstorage";
+import NotesPage from "@/components/NotesPage";
+import NotePage from "@/components/NotePage";
 
 export const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
             path: '/',
-            name: 'Home',
-            component: HomePage },
+            name: 'Notes',
+            component: NotesPage
+        },
+        {
+            path: '/note/:uuid',
+            name: 'Note',
+            component: NotePage
+        },
         {
             path: '/login',
             name: 'Login',
