@@ -1,25 +1,28 @@
 <template>
-  <LoginForm/>
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+
+      <Sidebar v-if="isShowSidebar"/>
+      <div class="col py-3">
+        <router-view/>
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script>
-import LoginForm from './components/LoginForm.vue'
+import Sidebar from "@/components/Sidebar";
 
 export default {
   name: 'App',
   components: {
-    LoginForm
+    Sidebar
+  },
+  computed:{
+    isShowSidebar(){
+      return this.$route.meta.sidebar !== false
+    }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

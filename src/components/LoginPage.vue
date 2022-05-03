@@ -23,7 +23,7 @@
                      v-bind:class="{'form-control':true, 'is-invalid' : validatePassword && !isValidPassword(password)}"
                      v-on:input="validatePassword = true"
               >
-              <div class="invalid-feedback">Пароль должен быть больше 7 символов!</div>
+              <div class="invalid-feedback">Пароль должен быть больше 3 символов!</div>
             </div>
             <div v-if="!loginActive" class="forms-inputs mb-4">
               <span>Подтверждение пароля</span>
@@ -34,11 +34,28 @@
               >
               <div class="invalid-feedback">{{ getConfirmPasswordErrorText() }}</div>
             </div>
+            <div v-if="hasLoginOrRegisterError" class="alert alert-danger" role="alert">
+              {{ loginOrRegisterErrorText }}
+            </div>
             <div class="mb-3">
-              <button v-on:click.stop.prevent="submit()" class="btn btn-dark w-100">{{ getLoginOrRegisterButtonText() }}</button>
+              <button
+                  :disabled='loginOrRegisterLoading'
+                  v-on:click.stop.prevent="submit()"
+                  class="btn btn-dark w-100"
+              >
+                <span
+                    v-if="loginOrRegisterLoading"
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true">
+                </span>
+                {{ getLoginOrRegisterButtonText() }}
+              </button>
             </div>
             <p>{{ getSignInOrSignUpText() }}
-              <a href="#" @click="loginOrRegisterOpenClick()">{{ getSignInOrSignUpRefText() }}</a>
+              <a href="#" @click="loginOrRegisterOpenClick()">
+                {{ getSignInOrSignUpRefText() }}
+              </a>
             </p>
           </div>
           <div class="success-data" v-else>
@@ -54,6 +71,8 @@
 </template>
 
 <script>
+import {authService} from "@/service/authservice";
+
 export default {
   name: 'HelloWorld',
   data: function () {
@@ -66,6 +85,9 @@ export default {
       validatePassword: false,
       confirmPassword: "",
       validateConfirmPassword: false,
+      loginOrRegisterLoading: false,
+      hasLoginOrRegisterError: false,
+      loginOrRegisterErrorText: ""
     }
   },
   methods: {
@@ -108,9 +130,11 @@ export default {
       this.validateUsername = false
       this.validatePassword = false
       this.validateConfirmPassword = false
+      this.hasLoginOrRegisterError = false
+      this.loginOrRegisterErrorText = ""
     },
     isValidPassword: function(password) {
-      return password.length >= 8
+      return password.length >= 4
     },
     isValidConfirmPassword: function(confirmPassword) {
       return confirmPassword.length > 0 && this.password === confirmPassword
@@ -131,14 +155,37 @@ export default {
           this.isValidPassword(this.password) &&
           this.isValidConfirmPassword(this.confirmPassword)
     },
-    submit : function() {
+    async postLogin() {
+      try {
+        this.loginOrRegisterLoading = true
+        await authService.login(this.username, this.password)
+        await this.$router.push("/")
+      } catch (e) {
+        this.loginOrRegisterErrorText = e
+        this.hasLoginOrRegisterError = true
+      } finally {
+        this.loginOrRegisterLoading = false
+      }
+    },
+    async postRegister() {
+      try {
+        this.loginOrRegisterLoading = true
+        await authService.register(this.username, this.password)
+      } catch (e) {
+        this.loginOrRegisterErrorText = e
+        this.hasLoginOrRegisterError = true
+      } finally {
+        this.loginOrRegisterLoading = false
+      }
+    },
+    submit: function() {
       if (this.loginActive) {
         if (this.isValidLoginData()) {
-          this.submitted=true
+          this.postLogin()
         }
       } else {
         if (this.isValidRegisterData()) {
-          this.submitted=true
+          this.postRegister()
         }
       }
     }
