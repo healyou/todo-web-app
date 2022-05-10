@@ -66,10 +66,10 @@
         ></textarea>
       </div>
     </div>
-    <div class="mb-3">
-      <label for="formFile" class="form-label">Прикреплённые файлы</label>
-      <input :disabled="isSavingNote" class="form-control" type="file" id="formFile">
-    </div>
+    <FilesDownloader
+        v-model="note.note_files"
+        :isDisabled="isSavingNote"
+    ></FilesDownloader>
     <!-- Need save dialog on exit -->
     <div class="modal fade" id="needSaveModal" tabindex="-1" aria-labelledby="needSaveModalLabel" aria-hidden="true">
       <div class="modal-dialog">
@@ -98,12 +98,16 @@ import {noteService} from "@/service/noteservice";
 import {showToastMixin} from "@/components/mixins/showToastMixin";
 import {ROUTER_NOTE_PAGE_NEW_NOTE_UUID_VALUE, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
 import {Modal} from "bootstrap";
+import FilesDownloader from "@/components/FilesDownloader";
 
 export default {
   name: 'HelloWorld',
   mixins: [
     showToastMixin
   ],
+  components: {
+    FilesDownloader
+  },
   data: function () {
     return {
       initialNote: null,

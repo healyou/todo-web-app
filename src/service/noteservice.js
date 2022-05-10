@@ -46,7 +46,20 @@ class NoteService {
             "deleted": false,
             "archive": false,
             "actual": true,
-            "note_files": []
+            "note_files": [{
+                    filename: null,
+                    data: null,
+                    id: null,
+                    note_id: null,
+                    guid: null
+                },
+                {
+                    filename: null,
+                    data: null,
+                    id: null,
+                    note_id: null,
+                    guid: null
+                }]
         }
     }
 
