@@ -1,12 +1,21 @@
 import {createStore} from 'vuex'
-import {ADD_TOAST, REMOVE_TOAST_BY_UUID, SET_LOADING_USER_NOTES, SET_USER_NOTES} from "@/configuration/store/mutation-types";
+import {
+    ADD_TOAST,
+    REMOVE_TOAST_BY_UUID,
+    SET_LOADING_MAIN_USER_NOTES_INFO,
+    SET_LOADING_USER_NOTES,
+    SET_MAIN_USER_NOTES_INFO,
+    SET_USER_NOTES
+} from "@/configuration/store/mutation-types";
 
 export default createStore({
     state () {
         return {
             toasts: [],
             userNotes: [],
-            isLoadingUserNotes: true
+            isLoadingUserNotes: true,
+            userMainNotesInfo: [],
+            isLoadingMainNotesInfo: true
         }
     },
     mutations: {
@@ -23,6 +32,12 @@ export default createStore({
         },
         [SET_LOADING_USER_NOTES] (state, isLoadingNotes) {
             state.isLoadingUserNotes = isLoadingNotes
+        },
+        [SET_MAIN_USER_NOTES_INFO] (state, userMainNotesInfo) {
+            state.userMainNotesInfo = userMainNotesInfo
+        },
+        [SET_LOADING_MAIN_USER_NOTES_INFO] (state, isLoadingMainNotesInfo) {
+            state.isLoadingMainNotesInfo = isLoadingMainNotesInfo
         }
     }
 })

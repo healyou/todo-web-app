@@ -1,6 +1,6 @@
 import axios from "axios";
 import {LS_AUTH_DATA_KEY} from "@/const/localstorage";
-import {AUTH_DATA_ACCESS_TOKEN_VALUE_NAME, WEB_API_ACCESS_TOKEN_HEADER_CODE} from "@/const/api";
+import {AUTH_DATA_ACCESS_TOKEN_VALUE_NAME, WEB_API_ACCESS_TOKEN_HEADER_CODE, WEB_API_BASE_URL} from "@/const/api";
 import {authService} from "@/service/authservice";
 import {router} from "@/configuration/router";
 import store from "@/configuration/store/store";
@@ -8,7 +8,7 @@ import {ADD_TOAST} from "@/configuration/store/mutation-types";
 import {Toast} from "@/entity/toast";
 
 export const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080/todo-web-api',
+    baseURL: WEB_API_BASE_URL,
     // timeout in ms - 15 секунд
     timeout: 15000
 })

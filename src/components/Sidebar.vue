@@ -2,21 +2,21 @@
   <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
     <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
       <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <span class="fs-5 d-none d-sm-inline">Menu</span>
+        <span class="fs-5 d-none d-sm-inline">Меню</span>
       </a>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
         <li class="nav-item">
-          <a href="#" class="nav-link align-middle px-0">
-            <i class="fs-4 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
-          </a>
+          <router-link to="/" class="nav-link align-middle px-0">
+            <i class="fs-4 bi-house"></i><span class="ms-1 d-none d-sm-inline">Главная</span>
+          </router-link>
         </li>
         <li>
           <a href="#submenu3" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
             <i class="fs-4 bi-grid"></i>
-            <span class="ms-1 d-none d-sm-inline">Заметки</span>
+            <span class="ms-1 d-none d-sm-inline">Недавние заметки</span>
           </a>
           <ul class="collapse show nav flex-column ms-1" id="submenu3" data-bs-parent="#menu">
-            <li v-if="isLoadingNotes">
+            <li v-if="isLoadingMainNotesInfo">
               <div class="d-flex justify-content-center">
                 <div class="spinner-border" role="status">
                   <span class="visually-hidden">Loading...</span>
@@ -24,12 +24,14 @@
               </div>
             </li>
             <li v-else
-                v-for="note in userNotes"
+                v-for="note in computedUserMainNotesInfo"
                 v-bind:key="note.id"
                 class="w-100">
-              <a href="#" class="nav-link px-0">
+              <router-link v-bind:to="'/note/' + note.guid"
+                 v-bind:class="note.selectedOnPage ? 'nav-link px-0 disabled' : 'nav-link px-0'"
+              >
                 <span class="d-none d-sm-inline">{{ note.title }}</span>
-              </a>
+              </router-link>
             </li>
           </ul>
         </li>
@@ -76,24 +78,73 @@
 <script>
 import {authService} from "@/service/authservice";
 import {mapMutations, mapState} from 'vuex'
-import {ADD_TOAST} from "@/configuration/store/mutation-types";
+import {SET_LOADING_MAIN_USER_NOTES_INFO, SET_MAIN_USER_NOTES_INFO} from "@/configuration/store/mutation-types";
 import {showToastMixin} from "@/components/mixins/showToastMixin";
+import {noteService} from "@/service/noteservice";
+import {ROUTER_NOTE_PAGE_NAME, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
 
 export default {
   name: 'HelloWorld',
   mixins: [
       showToastMixin
   ],
+  data() {
+    return {
+      forceRecomputeUserNotesInfo: false,
+    }
+  },
+  mounted() {
+    this.$nextTick(function () {
+      this.loadUserMainNotesInfo()
+    })
+  },
+  watch: {
+    $route(to) {
+      const currentPageName = to.name
+      if (currentPageName === ROUTER_NOTE_PAGE_NAME) {
+        this.forceRecomputeUserNotesInfo = !this.forceRecomputeUserNotesInfo
+      }
+    }
+  },
   computed: {
     ...mapState({
-      userNotes: state => state.userNotes,
-      isLoadingNotes: (state) => state.isLoadingUserNotes
-    })
+      userMainNotesInfo: state => state.userMainNotesInfo,
+      isLoadingMainNotesInfo: (state) => state.isLoadingMainNotesInfo
+    }),
+    computedUserMainNotesInfo() {
+      // для принудительного обновления свойства после изменения страницы
+      this.forceRecomputeUserNotesInfo
+
+      if (this.isLoadingMainNotesInfo) {
+        return []
+      }
+
+      const computedNotesInfo = []
+      for (let noteInfo of this.userMainNotesInfo) {
+        const computedNoteInfo = Object.assign(
+            {}, noteInfo, { selectedOnPage: this.isSelectedNotePage(noteInfo.guid)}
+        )
+        computedNotesInfo.push(computedNoteInfo)
+      }
+      return computedNotesInfo
+    }
   },
   methods: {
     ...mapMutations({
-      addToast: ADD_TOAST
+      setMainUserNotes: SET_MAIN_USER_NOTES_INFO,
+      setLoadingMainUserNotesInfo: SET_LOADING_MAIN_USER_NOTES_INFO
     }),
+    async loadUserMainNotesInfo() {
+      try {
+        this.setLoadingMainUserNotesInfo(true)
+        const notes = await noteService.getCurrentUserMainNotesInfo()
+        this.setMainUserNotes(notes)
+      } catch (e) {
+        this.showUnexpectedErrorToast(e)
+      } finally {
+        this.setLoadingMainUserNotesInfo(false)
+      }
+    },
     async logout() {
       try {
         await authService.logout()
@@ -104,7 +155,16 @@ export default {
         /* Веб часть зависит от куки auth - она точно удаляется */
         await this.$router.push("/login")
       }
-    }
+    },
+    isSelectedNotePage(noteGuid) {
+      const currentPageName = this.$route.name
+      if (currentPageName === ROUTER_NOTE_PAGE_NAME) {
+        const currentPageNoteUuid = this.$route.params[ROUTER_NOTE_PAGE_UUID_PARAM_NAME]
+        return currentPageNoteUuid === noteGuid
+      } else {
+        return false
+      }
+    },
   }
 }
 </script>
