@@ -33,6 +33,16 @@ class NoteService {
         return response.data
     }
 
+    createNewNoteFile(noteId, filename, data) {
+        return {
+            filename: filename,
+            data: data,
+            id: null,
+            note_id: noteId,
+            guid: uuidv4()
+        }
+    }
+
     createNewNote() {
         return {
             "id": null,
@@ -47,14 +57,14 @@ class NoteService {
             "archive": false,
             "actual": true,
             "note_files": [{
-                    filename: null,
+                    filename: 'Тестовый файл 1.txt',
                     data: null,
                     id: null,
                     note_id: null,
                     guid: null
                 },
                 {
-                    filename: null,
+                    filename: 'Тестовый файл 2.txt',
                     data: null,
                     id: null,
                     note_id: null,

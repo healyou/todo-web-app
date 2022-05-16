@@ -67,8 +67,9 @@
       </div>
     </div>
     <FilesDownloader
-        v-model="note.note_files"
+        v-model:model-value="note.note_files"
         :isDisabled="isSavingNote"
+        :noteId="note.id"
     ></FilesDownloader>
     <!-- Need save dialog on exit -->
     <div class="modal fade" id="needSaveModal" tabindex="-1" aria-labelledby="needSaveModalLabel" aria-hidden="true">
@@ -98,7 +99,7 @@ import {noteService} from "@/service/noteservice";
 import {showToastMixin} from "@/components/mixins/showToastMixin";
 import {ROUTER_NOTE_PAGE_NEW_NOTE_UUID_VALUE, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
 import {Modal} from "bootstrap";
-import FilesDownloader from "@/components/FilesDownloader";
+import FilesDownloader from "@/components/NoteFilesDownloader";
 
 export default {
   name: 'HelloWorld',
