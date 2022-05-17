@@ -44,7 +44,7 @@
 import {mapMutations, mapState} from "vuex";
 import {SET_LOADING_USER_NOTES, SET_USER_NOTES} from "@/configuration/store/mutation-types";
 import {noteService} from "@/service/noteservice";
-import {showToastMixin} from "@/components/mixins/showToastMixin";
+import {showToastMixin} from "@/mixins/showToastMixin";
 import {ROUTER_NOTE_PAGE_NEW_NOTE_UUID_VALUE} from "@/const/app";
 
 export default {

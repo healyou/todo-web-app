@@ -55,31 +55,13 @@
       </div>
     </div>
   </div>
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
 import {authService} from "@/service/authservice";
 import {mapMutations, mapState} from 'vuex'
 import {SET_LOADING_MAIN_USER_NOTES_INFO, SET_MAIN_USER_NOTES_INFO} from "@/configuration/store/mutation-types";
-import {showToastMixin} from "@/components/mixins/showToastMixin";
+import {showToastMixin} from "@/mixins/showToastMixin";
 import {noteService} from "@/service/noteservice";
 import {ROUTER_NOTE_PAGE_NAME, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
 

@@ -39,7 +39,7 @@ class NoteService {
             data: data,
             id: null,
             note_id: noteId,
-            guid: uuidv4()
+            guid: null
         }
     }
 

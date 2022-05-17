@@ -2,7 +2,12 @@
   <div class="container-fluid">
     <div class="row flex-nowrap">
 
-      <Sidebar v-if="isShowSidebar"/>
+      <!-- Грузим Sidebar только тогда, когда он нужен -->
+      <Suspense v-if="isShowSidebar">
+        <template #default>
+          <LazySidebar/>
+        </template>
+      </Suspense>
       <div class="col py-3">
         <router-view/>
       </div>
@@ -13,13 +18,17 @@
 </template>
 
 <script>
-import Sidebar from "@/components/Sidebar";
+import { defineAsyncComponent } from 'vue'
 import ToastContainer from "@/components/ToastContainer";
+
+const LazySidebar = defineAsyncComponent(() =>
+    import("@/components/Sidebar")
+)
 
 export default {
   name: 'App',
   components: {
-    Sidebar,
+    LazySidebar,
     ToastContainer
   },
   computed:{

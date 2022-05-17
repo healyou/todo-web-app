@@ -4,11 +4,13 @@
       <label class="form-label me-3">Прикреплённые файлы</label>
       <button
           v-on:click="openAddFileModal()"
-          v-if='!isDisabled'
+          :disabled="isDisabled"
           data-bs-target="#addFileModal"
           type="button"
           class="btn btn-outline-primary "
-      >Add</button>
+      >
+        <i class="bi bi-plus-lg"></i>
+      </button>
     </div>
     <div v-for="(file, index) in computedFileValues"
          v-bind:key="file.uuid"
@@ -16,15 +18,20 @@
     >
       <div>
         <a
-            :disabled="file.id === null"
+            :disabled="file.id === null || isDisabled"
             v-bind:class="file.id === null ?
               'col-form-label btn form-control link-primary text-start disabled' :
               'btn form-control link-primary text-start'"
             v-on:click="downloadFile(file.id)" href="#">{{ file.filename }}</a>
       </div>
       <div>
-<!--        <button class="btn btn-outline-success">edit</button>-->
-        <button v-on:click="removeFile(index)" class="btn btn-outline-danger">remove</button>
+        <button
+            :disabled="isDisabled"
+            v-on:click="removeFile(index)"
+            class="btn btn-outline-danger"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
       </div>
     </div>
     <!-- Need save dialog on exit -->
@@ -63,7 +70,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import {Modal} from "bootstrap";
 import {MAX_UPLOAD_FILE_SIZE_BYTES} from "@/const/app";
-import {showToastMixin} from "@/components/mixins/showToastMixin";
+import {showToastMixin} from "@/mixins/showToastMixin";
 import {noteService} from "@/service/noteservice";
 
 export default {
@@ -154,13 +161,15 @@ export default {
       const currentComponent = this
       const file = this.$refs.addFileInput.files[0]
       const reader = new FileReader()
+      // reader.readAsBinaryString(file)
       reader.readAsArrayBuffer(file)
       reader.onload = function(e) {
         const arrayBuffer = e.target.result
         const bytes = new Uint8Array(arrayBuffer)
 
         const noteFiles = currentComponent.modelValue
-        const noteFile = noteService.createNewNoteFile(currentComponent.noteId, file.name, bytes)
+        const base64String = btoa(String.fromCharCode.apply(null, bytes));
+        const noteFile = noteService.createNewNoteFile(currentComponent.noteId, file.name, base64String)
         noteFiles.push(noteFile)
         currentComponent.updateModelValue(noteFiles)
 

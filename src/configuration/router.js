@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import LoginPage from '../components/LoginPage'
+import LoginPage from '../pages/LoginPage'
 import {LS_AUTH_DATA_KEY} from "@/const/localstorage";
-import NotesPage from "@/components/NotesPage";
-import NotePage from "@/components/NotePage";
+import NotesPage from "@/pages/NotesPage";
+import NotePage from "@/pages/NotePage";
 import {
     ROUTER_LOGIN_PAGE_NAME,
     ROUTER_NOTE_PAGE_NAME,

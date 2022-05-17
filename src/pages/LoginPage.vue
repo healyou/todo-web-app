@@ -69,7 +69,7 @@
 
 <script>
 import {authService} from "@/service/authservice";
-import {showToastMixin} from "@/components/mixins/showToastMixin";
+import {showToastMixin} from "@/mixins/showToastMixin";
 
 export default {
   name: 'HelloWorld',

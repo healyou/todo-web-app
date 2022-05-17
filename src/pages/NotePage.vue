@@ -96,7 +96,7 @@
 import {mapMutations, mapState} from "vuex";
 import {SET_LOADING_USER_NOTES, SET_USER_NOTES} from "@/configuration/store/mutation-types";
 import {noteService} from "@/service/noteservice";
-import {showToastMixin} from "@/components/mixins/showToastMixin";
+import {showToastMixin} from "@/mixins/showToastMixin";
 import {ROUTER_NOTE_PAGE_NEW_NOTE_UUID_VALUE, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
 import {Modal} from "bootstrap";
 import FilesDownloader from "@/components/NoteFilesDownloader";
