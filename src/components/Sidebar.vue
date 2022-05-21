@@ -39,8 +39,7 @@
       <hr>
       <div class="dropdown pb-4">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
-          <span class="d-none d-sm-inline mx-1">loser</span>
+          <span class="d-none d-sm-inline mx-1">{{ getUsername() }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
           <li>
@@ -64,6 +63,7 @@ import {SET_LOADING_MAIN_USER_NOTES_INFO, SET_MAIN_USER_NOTES_INFO} from "@/conf
 import {showToastMixin} from "@/mixins/showToastMixin";
 import {noteService} from "@/service/noteservice";
 import {ROUTER_NOTE_PAGE_NAME, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
+import {getUsernameFromAccessToken} from "@/const/localstorage";
 
 export default {
   name: 'HelloWorld',
@@ -116,6 +116,9 @@ export default {
       setMainUserNotes: SET_MAIN_USER_NOTES_INFO,
       setLoadingMainUserNotesInfo: SET_LOADING_MAIN_USER_NOTES_INFO
     }),
+    getUsername() {
+      return getUsernameFromAccessToken()
+    },
     async loadUserMainNotesInfo() {
       try {
         this.setLoadingMainUserNotesInfo(true)
@@ -131,8 +134,8 @@ export default {
       try {
         await authService.logout()
       } catch (e) {
-        // TODO - загрузка списка заметок
-        this.showUnexpectedErrorToast(e)
+        /* Пользователю не надо сообщать о проблемах с выходом */
+        console.log(e)
       } finally {
         /* Веб часть зависит от куки auth - она точно удаляется */
         await this.$router.push("/login")

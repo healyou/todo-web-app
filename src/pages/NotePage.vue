@@ -162,26 +162,14 @@ export default {
     },
     async createNewNote() {
       this.note = noteService.createNewNote()
-      this.initialNote = Object.assign({}, this.note)
-      this.initialNote.note_files = []
-      if (this.note.note_files) {
-        for (let file of this.note.note_files) {
-          this.initialNote.note_files.push(Object.assign({}, file))
-        }
-      }
+      this.initialNote = noteService.copyNote(this.note)
       this.isLoadingNote = false
     },
     async loadUserNote(currentNoteGuid) {
       try {
         this.isLoadingNote = true
         this.note = await noteService.getActualNote(currentNoteGuid)
-        this.initialNote = Object.assign({}, this.note)
-        this.initialNote.note_files = []
-        if (this.note.note_files) {
-          for (let file of this.note.note_files) {
-            this.initialNote.note_files.push(Object.assign({}, file))
-          }
-        }
+        this.initialNote = noteService.copyNote(this.note)
       } catch (e) {
         this.showUnexpectedErrorToast(e)
       } finally {

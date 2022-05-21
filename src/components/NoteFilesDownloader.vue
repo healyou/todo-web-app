@@ -98,16 +98,10 @@ export default {
       isFileAdded: false
     }
   },
-  created() {
-    if (this.modelValue === null) {
-      this.updateModelValue([])
-    }
-  },
   computed: {
     computedFileValues() {
       const computedFileValues = []
-      const value = (this.modelValue === null) ? [] : this.modelValue
-      for (let file of value) {
+      for (let file of this.modelValue) {
         const computedFile = Object.assign(
             {}, file, { uuid: uuidv4() }
         )
@@ -126,16 +120,18 @@ export default {
     async downloadFile(file) {
       try {
         const data = await noteService.downloadNoteFile(file.id)
-
-        const url = window.URL.createObjectURL(new Blob([data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', file.filename);
-        document.body.appendChild(link);
-        link.click();
+        this.uploadFileInBrowser(data, file.filename)
       } catch (e) {
         this.showUnexpectedErrorToast(e)
       }
+    },
+    uploadFileInBrowser(blobData, filename) {
+      const url = window.URL.createObjectURL(new Blob([blobData]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
     },
     removeFile(fileIndex) {
       const files = this.modelValue
