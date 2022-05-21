@@ -22,7 +22,7 @@
             v-bind:class="file.id === null ?
               'col-form-label btn form-control link-primary text-start disabled' :
               'btn form-control link-primary text-start'"
-            v-on:click="downloadFile(file.id)" href="#">{{ file.filename }}</a>
+            v-on:click="downloadFile(file)">{{ file.filename }}</a>
       </div>
       <div>
         <button
@@ -45,7 +45,7 @@
           <div class="modal-body">
             <input
                 ref="addFileInput"
-                @input="handleInputFile($event, index)"
+                @input="handleInputFile()"
                 v-bind:class="{'form-control':true, 'is-invalid' : isValidateAddFileError}"
                 type="file"
             >
@@ -123,14 +123,19 @@ export default {
     updateModelValue(value) {
       this.$emit('update:modelValue', value)
     },
-    isLastFileItem(index) {
-      return this.modelValue.length - 1 === index
-    },
-    isTwoOrMoreFileItem() {
-      return this.modelValue.length > 1
-    },
-    downloadFile(noteFileId) {
-      console.log(noteFileId)
+    async downloadFile(file) {
+      try {
+        const data = await noteService.downloadNoteFile(file.id)
+
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', file.filename);
+        document.body.appendChild(link);
+        link.click();
+      } catch (e) {
+        this.showUnexpectedErrorToast(e)
+      }
     },
     removeFile(fileIndex) {
       const files = this.modelValue
@@ -147,9 +152,7 @@ export default {
       const modal = new Modal(addFileModal)
       modal.show()
     },
-    handleInputFile(event, index) {
-      console.log(index)
-
+    handleInputFile() {
       const uploadFileSizeBytes = this.$refs.addFileInput.files[0].size
       this.isValidateAddFileError = uploadFileSizeBytes > MAX_UPLOAD_FILE_SIZE_BYTES
       this.isFileAdded = true

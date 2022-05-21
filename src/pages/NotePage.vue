@@ -127,17 +127,25 @@ export default {
     const uuidParamValue = to.params[ROUTER_NOTE_PAGE_UUID_PARAM_NAME]
     await this.loadOrCreateNewNote(uuidParamValue)
   },
+  watch: {
+    note: {
+      deep: true
+    }
+  },
   computed: {
     ...mapState({
       userNotes: state => state.userNotes,
       isLoadingNotes: (state) => state.isLoadingUserNotes
     }),
     getSaveOrExitButtonName() {
-      if (this.isFormChanged()) {
+      if (this.isFormChanged) {
         return "Сохранить и выйти"
       } else {
         return "Сохранить и выйти (изменений нет)"
       }
+    },
+    isFormChanged() {
+      return this.note.id === null || JSON.stringify(this.initialNote) !== JSON.stringify(this.note)
     }
   },
   methods: {
@@ -155,6 +163,12 @@ export default {
     async createNewNote() {
       this.note = noteService.createNewNote()
       this.initialNote = Object.assign({}, this.note)
+      this.initialNote.note_files = []
+      if (this.note.note_files) {
+        for (let file of this.note.note_files) {
+          this.initialNote.note_files.push(Object.assign({}, file))
+        }
+      }
       this.isLoadingNote = false
     },
     async loadUserNote(currentNoteGuid) {
@@ -162,6 +176,12 @@ export default {
         this.isLoadingNote = true
         this.note = await noteService.getActualNote(currentNoteGuid)
         this.initialNote = Object.assign({}, this.note)
+        this.initialNote.note_files = []
+        if (this.note.note_files) {
+          for (let file of this.note.note_files) {
+            this.initialNote.note_files.push(Object.assign({}, file))
+          }
+        }
       } catch (e) {
         this.showUnexpectedErrorToast(e)
       } finally {
@@ -190,7 +210,7 @@ export default {
       await this.saveAndGoToHomePage()
     },
     async saveOrExitButtonClick() {
-      if (this.isFormChanged()) {
+      if (this.isFormChanged) {
         await this.saveAndGoToHomePage()
       } else {
         await this.goToHomePage()
@@ -207,14 +227,11 @@ export default {
       modal.show()
     },
     openNeedSaveModalIfExistsFormChanges() {
-      if (this.isFormChanged()) {
+      if (this.isFormChanged) {
         this.openNeedSaveModal()
       } else {
         this.goToHomePage()
       }
-    },
-    isFormChanged() {
-      return this.note.id === null || JSON.stringify(this.initialNote) !== JSON.stringify(this.note)
     }
   }
 }

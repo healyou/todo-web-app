@@ -6,6 +6,7 @@ export const WEB_API_LOGOUT_PATH='/auth-api/logout'
 
 export const WEB_API_GET_USER_NOTES_PATH='/notes-api/notes/getUserNotes'
 export const WEB_API_GET_ACTUAL_NOTE_PATH='/notes-api/notes/getActualNote'
+export const WEB_API_GET_NOTE_FILE_BODY_PATH='/notes-api/notes/getNoteFileBody'
 export const WEB_API_SAVE_NOTE_PATH='/notes-api/notes/saveNote'
 export const WEB_API_GET_GET_LAST_USER_NOTE_MAIN_INFO_PATH='/notes-api/notes/getLastUserNoteMainInfo'
 
@@ -16,6 +17,8 @@ export const WEB_API_PASSWORD_PARAM_NAME='password'
 export const WEB_API_USER_ID_PARAM_NAME='user_id'
 export const WEB_API_GUID_PARAM_NAME='guid'
 export const WEB_API_MAX_COUNT_LIMIT_PARAM_NAME='max_count_limit'
+export const WEB_API_NOTE_FILE_ID_PARAM_NAME='id'
+
 
 export const WEB_API_ACCESS_TOKEN_HEADER_CODE='X-Access-Token'
 export const WEB_API_REFRESH_TOKEN_HEADER_CODE='X-Refresh-Token'

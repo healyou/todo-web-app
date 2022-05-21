@@ -2,9 +2,9 @@ import {getUserIdFormAccessToken} from "@/const/localstorage";
 import {axiosInstance} from "@/configuration/axios";
 import {
     WEB_API_GET_ACTUAL_NOTE_PATH,
-    WEB_API_GET_GET_LAST_USER_NOTE_MAIN_INFO_PATH,
+    WEB_API_GET_GET_LAST_USER_NOTE_MAIN_INFO_PATH, WEB_API_GET_NOTE_FILE_BODY_PATH,
     WEB_API_GET_USER_NOTES_PATH, WEB_API_GUID_PARAM_NAME,
-    WEB_API_MAX_COUNT_LIMIT_PARAM_NAME, WEB_API_SAVE_NOTE_PATH,
+    WEB_API_MAX_COUNT_LIMIT_PARAM_NAME, WEB_API_NOTE_FILE_ID_PARAM_NAME, WEB_API_SAVE_NOTE_PATH,
     WEB_API_USER_ID_PARAM_NAME
 } from "@/const/api";
 import {SIDEBAR_MAX_COUNT_NOTES_COUNT} from "@/const/app";
@@ -30,6 +30,17 @@ class NoteService {
         const formData = new FormData()
         formData.append(WEB_API_GUID_PARAM_NAME, noteGuid)
         const response = await axiosInstance.post(WEB_API_GET_ACTUAL_NOTE_PATH, formData)
+        return response.data
+    }
+
+    async downloadNoteFile(noteFileId) {
+        const formData = new FormData()
+        formData.append(WEB_API_NOTE_FILE_ID_PARAM_NAME, noteFileId)
+        const config = {
+            responseType: 'blob'
+        }
+
+        const response = await axiosInstance.post(WEB_API_GET_NOTE_FILE_BODY_PATH, formData, config)
         return response.data
     }
 
