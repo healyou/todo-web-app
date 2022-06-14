@@ -1,19 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import HomePage from '../components/HomePage'
-import LoginPage from '../components/LoginPage'
+import LoginPage from '../pages/LoginPage'
 import {LS_AUTH_DATA_KEY} from "@/const/localstorage";
+import NotesPage from "@/pages/NotesPage";
+import NotePage from "@/pages/NotePage";
+import {
+    ROUTER_LOGIN_PAGE_NAME,
+    ROUTER_NOTE_PAGE_NAME,
+    ROUTER_NOTE_PAGE_UUID_PARAM_NAME,
+    ROUTER_NOTES_PAGE_NAME
+} from "@/const/app";
 
 export const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
             path: '/',
-            name: 'Home',
-            component: HomePage },
+            name: ROUTER_NOTES_PAGE_NAME,
+            component: NotesPage
+        },
+        {
+            path: '/note/:' + ROUTER_NOTE_PAGE_UUID_PARAM_NAME,
+            name: ROUTER_NOTE_PAGE_NAME,
+            component: NotePage
+        },
         {
             path: '/login',
-            name: 'Login',
+            name: ROUTER_LOGIN_PAGE_NAME,
             component: LoginPage,
             meta: {
                 sidebar:false
