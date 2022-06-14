@@ -15,7 +15,11 @@ class NoteService {
         const formData = new FormData()
         formData.append(WEB_API_USER_ID_PARAM_NAME, getUserIdFromAccessToken())
         const response = await axiosInstance.post(WEB_API_GET_USER_NOTES_PATH, formData)
-        return response.data
+        if (response.data === null) {
+            return []
+        } else {
+            return response.data
+        }
     }
 
     async getCurrentUserMainNotesInfo() {
@@ -23,7 +27,11 @@ class NoteService {
         formData.append(WEB_API_USER_ID_PARAM_NAME, getUserIdFromAccessToken())
         formData.append(WEB_API_MAX_COUNT_LIMIT_PARAM_NAME, SIDEBAR_MAX_COUNT_NOTES_COUNT.toString())
         const response = await axiosInstance.post(WEB_API_GET_GET_LAST_USER_NOTE_MAIN_INFO_PATH, formData)
-        return response.data
+        if (response.data === null) {
+            return []
+        } else {
+            return response.data
+        }
     }
 
     async getActualNote(noteGuid) {

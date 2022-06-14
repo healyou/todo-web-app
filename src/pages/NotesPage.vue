@@ -17,7 +17,11 @@
     <div class="album py-5 bg-light">
       <div class="container">
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-          <div v-for="note in userNotes"
+          <div v-if="userNotes.length === 0" class="col">
+            Нет заметок
+          </div>
+          <div v-else
+               v-for="note in userNotes"
                v-bind:key="note.id"
                class="col"
           >

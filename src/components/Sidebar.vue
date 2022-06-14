@@ -16,23 +16,30 @@
             <span class="ms-1 d-none d-sm-inline">Недавние заметки</span>
           </a>
           <ul class="collapse show nav flex-column ms-1" id="submenu3" data-bs-parent="#menu">
-            <li v-if="isLoadingMainNotesInfo">
-              <div class="d-flex justify-content-center">
-                <div class="spinner-border" role="status">
-                  <span class="visually-hidden">Loading...</span>
+            <div v-if="isLoadingMainNotesInfo">
+              <li>
+                <div class="d-flex justify-content-center">
+                  <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
                 </div>
-              </div>
-            </li>
-            <li v-else
-                v-for="note in computedUserMainNotesInfo"
-                v-bind:key="note.id"
-                class="w-100">
-              <router-link v-bind:to="'/note/' + note.guid"
-                 v-bind:class="note.selectedOnPage ? 'nav-link px-0 disabled' : 'nav-link px-0'"
-              >
-                <span class="d-none d-sm-inline">{{ note.title }}</span>
-              </router-link>
-            </li>
+              </li>
+            </div>
+            <div v-else>
+              <li v-if="computedUserMainNotesInfo.length === 0">
+                <span class="d-none d-sm-inline">Нет заметок</span>
+              </li>
+              <li v-else
+                  v-for="note in computedUserMainNotesInfo"
+                  v-bind:key="note.id"
+                  class="w-100">
+                <router-link v-bind:to="'/note/' + note.guid"
+                   v-bind:class="note.selectedOnPage ? 'nav-link px-0 disabled' : 'nav-link px-0'"
+                >
+                  <span class="d-none d-sm-inline">{{ note.title }}</span>
+                </router-link>
+              </li>
+            </div>
           </ul>
         </li>
       </ul>
