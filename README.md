@@ -1,6 +1,7 @@
 # todo-web-app
 
 ## Project setup
+Development nodejs version 16.15.1
 ```
 npm install
 ```

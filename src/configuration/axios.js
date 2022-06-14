@@ -25,24 +25,8 @@ axiosInstance.interceptors.request.use(
 
 /* true - была вызвана функция обновления токена */
 let isRefreshTokenCalled = false
-/* процессы, ожидающие результата рефреша токена */
-let promisesForWaitRefreshToken = []
-async function successGetRefreshToken() {
-    promisesRun(false, null)
-}
-async function errorGetRefreshToken(error) {
-    promisesRun(true, error)
-}
-function promisesRun(isReject, error) {
-    promisesForWaitRefreshToken.forEach(promise => {
-        if (isReject) {
-            promise.reject(error)
-        } else {
-            promise.resolve()
-        }
-    })
-    promisesForWaitRefreshToken = []
-}
+let isLastRefreshTokenSuccess = false
+let lastRefreshTokenError = null
 
 axiosInstance.interceptors.response.use(
     (response) => {
@@ -67,7 +51,25 @@ axiosInstance.interceptors.response.use(
 
 async function waitForRefreshingTokenAndRetryRequest(error) {
     return new Promise(function(resolve, reject) {
-        promisesForWaitRefreshToken.push({resolve, reject})
+        let executeCheckTimes = 0
+        const checkTokenMs = 1500
+        const maxCheckTokenTimes = 10
+        setTimeout(function checkRefreshingToken() {
+            executeCheckTimes++
+            if (!isRefreshTokenCalled) {
+                if (isLastRefreshTokenSuccess) {
+                    resolve()
+                } else {
+                    reject(lastRefreshTokenError)
+                }
+            } else {
+                if (executeCheckTimes <= maxCheckTokenTimes) {
+                    setTimeout(checkRefreshingToken, checkTokenMs)
+                } else {
+                    reject(error)
+                }
+            }
+        }, checkTokenMs)
     }).then(() => {
         return axiosInstance(error.config);
     }).catch(err => {
@@ -78,14 +80,15 @@ async function waitForRefreshingTokenAndRetryRequest(error) {
 async function refreshTokenAndRetryRequest(error) {
     try {
         await authService.refreshToken()
-        await successGetRefreshToken()
+        isLastRefreshTokenSuccess = true
         return axiosInstance(error.config)
     } catch (e) {
         /* Не выводим уведомлеия для n параллельных запросов с ошибкой 401 - выведем руками ниже 1 раз, вместо n */
         e.isAlreadyAddedToast = true
         addTokenExpiredErrorToast()
 
-        await errorGetRefreshToken(e)
+        lastRefreshTokenError = e
+        isLastRefreshTokenSuccess = false
         await logout()
         return Promise.reject(e)
     } finally {
