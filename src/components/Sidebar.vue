@@ -66,7 +66,9 @@
 <script>
 import {authService} from "@/service/authservice";
 import {mapMutations, mapState} from 'vuex'
-import {SET_LOADING_MAIN_USER_NOTES_INFO, SET_MAIN_USER_NOTES_INFO} from "@/configuration/store/mutation-types";
+import {
+  SET_LOADING_MAIN_USER_NOTES_INFO, SET_MAIN_USER_NOTES_INFO, SET_NEED_RELOAD_USER_MAIN_NOTES_INFO
+} from "@/configuration/store/mutation-types";
 import {showToastMixin} from "@/mixins/showToastMixin";
 import {noteService} from "@/service/noteservice";
 import {ROUTER_NOTE_PAGE_NAME, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
@@ -87,18 +89,11 @@ export default {
       this.loadUserMainNotesInfo()
     })
   },
-  watch: {
-    $route(to) {
-      const currentPageName = to.name
-      if (currentPageName === ROUTER_NOTE_PAGE_NAME) {
-        this.forceRecomputeUserNotesInfo = !this.forceRecomputeUserNotesInfo
-      }
-    }
-  },
   computed: {
     ...mapState({
       userMainNotesInfo: state => state.userMainNotesInfo,
-      isLoadingMainNotesInfo: (state) => state.isLoadingMainNotesInfo
+      isLoadingMainNotesInfo: (state) => state.isLoadingMainNotesInfo,
+      isNeedReloadUserMainNotesInfo: (state) => state.isNeedReloadUserMainNotesInfo
     }),
     computedUserMainNotesInfo() {
       // для принудительного обновления свойства после изменения страницы
@@ -118,13 +113,33 @@ export default {
       return computedNotesInfo
     }
   },
+  watch: {
+    $route(to) {
+      const currentPageName = to.name
+      if (currentPageName === ROUTER_NOTE_PAGE_NAME) {
+        this.forceRecomputeUserNotesInfo = !this.forceRecomputeUserNotesInfo
+      }
+    },
+    isNeedReloadUserMainNotesInfo(isNeedReload) {
+      console.log('ggwp')
+      if (isNeedReload) {
+        this.reloadMainUserNotesInfo()
+      }
+    }
+  },
   methods: {
     ...mapMutations({
       setMainUserNotes: SET_MAIN_USER_NOTES_INFO,
-      setLoadingMainUserNotesInfo: SET_LOADING_MAIN_USER_NOTES_INFO
+      setLoadingMainUserNotesInfo: SET_LOADING_MAIN_USER_NOTES_INFO,
+      setNeedReloadUserMainNotesInfo: SET_NEED_RELOAD_USER_MAIN_NOTES_INFO
     }),
     getUsername() {
       return getUsernameFromAccessToken()
+    },
+    async reloadMainUserNotesInfo() {
+      this.userMainNotesInfo = []
+      await this.loadUserMainNotesInfo()
+      this.setNeedReloadUserMainNotesInfo(false)
     },
     async loadUserMainNotesInfo() {
       try {

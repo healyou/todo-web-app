@@ -94,7 +94,11 @@
 
 <script>
 import {mapMutations, mapState} from "vuex";
-import {SET_LOADING_USER_NOTES, SET_USER_NOTES} from "@/configuration/store/mutation-types";
+import {
+  SET_LOADING_USER_NOTES,
+  SET_NEED_RELOAD_USER_MAIN_NOTES_INFO,
+  SET_USER_NOTES
+} from "@/configuration/store/mutation-types";
 import {noteService} from "@/service/noteservice";
 import {showToastMixin} from "@/mixins/showToastMixin";
 import {ROUTER_NOTE_PAGE_NEW_NOTE_UUID_VALUE, ROUTER_NOTE_PAGE_UUID_PARAM_NAME} from "@/const/app";
@@ -146,7 +150,8 @@ export default {
   methods: {
     ...mapMutations({
       setUserNotes: SET_USER_NOTES,
-      setLoadingNotes: SET_LOADING_USER_NOTES
+      setLoadingNotes: SET_LOADING_USER_NOTES,
+      setNeedReloadUserMainNotesInfo: SET_NEED_RELOAD_USER_MAIN_NOTES_INFO
     }),
     async loadOrCreateNewNote(uuidParamValue) {
       if (uuidParamValue === ROUTER_NOTE_PAGE_NEW_NOTE_UUID_VALUE) {
@@ -181,6 +186,7 @@ export default {
       try {
         this.isSavingNote = true
         await noteService.saveNote(this.note)
+        this.setNeedReloadUserMainNotesInfo(true)
         return true
       } catch (e) {
         this.showUnexpectedErrorToast(e)
