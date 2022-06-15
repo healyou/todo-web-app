@@ -127,11 +127,6 @@ export default {
     const uuidParamValue = to.params[ROUTER_NOTE_PAGE_UUID_PARAM_NAME]
     await this.loadOrCreateNewNote(uuidParamValue)
   },
-  watch: {
-    note: {
-      deep: true
-    }
-  },
   computed: {
     ...mapState({
       userNotes: state => state.userNotes,
