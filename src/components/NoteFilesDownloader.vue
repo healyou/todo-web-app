@@ -34,47 +34,23 @@
         </button>
       </div>
     </div>
-    <!-- Need save dialog on exit -->
-    <div class="modal fade" id="addFileModal" tabindex="-1" aria-labelledby="addFileModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addFileModalLabel">Добавление файла</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <input
-                ref="addFileInput"
-                @input="handleInputFile()"
-                v-bind:class="{'form-control':true, 'is-invalid' : isValidateAddFileError}"
-                type="file"
-            >
-            <div class="invalid-feedback">Размер файла не может превышать 5 мб</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" v-on:click="closeAddFileModalClick()" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-            <button
-                v-on:click="saveAddFileModalClick()"
-                :disabled="isDisabledSaveAddFileInModal"
-                type="button"
-                class="btn btn-primary"
-            >Сохранить</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <FileUploadModal
+        :isVisibleUploadFileModal="isVisibleUploadFileModal"
+        @hideModal="isVisibleUploadFileModal = false"
+        @addFile="saveAddFileFromModal"
+    ></FileUploadModal>
   </div>
 </template>
 
 <script>
 import { v4 as uuidv4 } from 'uuid';
-import {Modal} from "bootstrap";
-import {MAX_UPLOAD_FILE_SIZE_BYTES} from "@/const/app";
 import {showToastMixin} from "@/mixins/showToastMixin";
 import {noteService} from "@/service/noteservice";
+import FileUploadModal from "@/components/FileUploadModal";
 
 export default {
   name: "FilesDownloader",
+  components: {FileUploadModal},
   mixins: [
     showToastMixin
   ],
@@ -94,6 +70,7 @@ export default {
   data () {
     return {
       content: this.value,
+      isVisibleUploadFileModal: false,
       isValidateAddFileError: false,
       isFileAdded: false
     }
@@ -109,9 +86,6 @@ export default {
       }
       return computedFileValues
     },
-    isDisabledSaveAddFileInModal() {
-      return this.isValidateAddFileError || !this.isFileAdded
-    }
   },
   methods: {
     updateModelValue(value) {
@@ -139,56 +113,31 @@ export default {
       this.updateModelValue(files)
     },
     openAddFileModal() {
-      const addFileModal = document.getElementById('addFileModal')
+      this.isVisibleUploadFileModal = true
+    },
+    saveAddFileFromModal(file) {
       const currentComponent = this
-      addFileModal.addEventListener('hidden.bs.modal', function () {
-        currentComponent.clearAddFileInput()
-      })
-      // по акрытию очищать ввод
-      const modal = new Modal(addFileModal)
-      modal.show()
-    },
-    handleInputFile() {
-      const uploadFileSizeBytes = this.$refs.addFileInput.files[0].size
-      this.isValidateAddFileError = uploadFileSizeBytes > MAX_UPLOAD_FILE_SIZE_BYTES
-      this.isFileAdded = true
-    },
-    closeAddFileModalClick() {
-      this.clearAddFileInput()
-    },
-    saveAddFileModalClick() {
-      const currentComponent = this
-      const file = this.$refs.addFileInput.files[0]
+
       const reader = new FileReader()
-      // reader.readAsBinaryString(file)
       reader.readAsArrayBuffer(file)
       reader.onload = function(e) {
-        const arrayBuffer = e.target.result
-        const bytes = new Uint8Array(arrayBuffer)
+        try {
+          const arrayBuffer = e.target.result
+          const bytes = new Uint8Array(arrayBuffer)
 
-        const noteFiles = currentComponent.modelValue
-        const base64String = btoa(String.fromCharCode.apply(null, bytes));
-        const noteFile = noteService.createNewNoteFile(currentComponent.noteId, file.name, base64String)
-        noteFiles.push(noteFile)
-        currentComponent.updateModelValue(noteFiles)
-
-        currentComponent.hideAddFileModal()
+          const noteFiles = currentComponent.modelValue
+          const base64String = btoa(String.fromCharCode.apply(null, bytes));
+          const noteFile = noteService.createNewNoteFile(currentComponent.noteId, file.name, base64String)
+          noteFiles.push(noteFile)
+          currentComponent.updateModelValue(noteFiles)
+        } catch (e) {
+          this.showUnexpectedErrorToast(e)
+        }
       }
       reader.onerror = function(e) {
-        currentComponent.hideAddFileModal()
         this.showUnexpectedErrorToast(e)
       }
       reader.read
-    },
-    clearAddFileInput() {
-      this.$refs.addFileInput.value = null
-      this.isFileAdded = false
-      this.isValidateAddFileError = false
-    },
-    hideAddFileModal() {
-      const addFileModal = document.getElementById('addFileModal')
-      const modal = Modal.getOrCreateInstance(addFileModal)
-      modal.hide()
     }
   }
 }
