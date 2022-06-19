@@ -1,0 +1,14 @@
+version: '3.2'
+
+services:
+
+  todo-web-app:
+    image: todo-web-app:latest
+    container_name: todo-web-app
+    restart: always
+    ports:
+      - "8083:80"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
