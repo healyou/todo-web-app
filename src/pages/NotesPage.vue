@@ -27,7 +27,7 @@
           >
             <div class="card shadow-sm">
               <div class="card-body">
-                <p class="card-heading">{{ note.title }}</p>
+                <p class="card-heading">{{ note.title }} user={{ note.user.user_id }}</p>
                 <p class="card-text">{{ note.text.substring(0, 100) }} ...</p>
                 <div class="d-flex justify-content-between align-items-center">
                   <div class="btn-group">

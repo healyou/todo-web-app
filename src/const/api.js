@@ -4,7 +4,7 @@ export const WEB_API_REFRESH_TOKEN_PATH='/auth-api/refreshToken'
 export const WEB_API_REGISTER_PATH='/users-api/users/register'
 export const WEB_API_LOGOUT_PATH='/auth-api/logout'
 
-export const WEB_API_GET_USER_NOTES_PATH='/notes-api/notes/getUserNotes'
+export const WEB_API_GRAPHQL_PATH='/graphql'
 export const WEB_API_GET_ACTUAL_NOTE_PATH='/notes-api/notes/getActualNote'
 export const WEB_API_GET_NOTE_FILE_BODY_PATH='/notes-api/notes/getNoteFileBody'
 export const WEB_API_SAVE_NOTE_PATH='/notes-api/notes/saveNote'
