@@ -39,6 +39,11 @@ Dockerfile - Файл Dockerfile находится в корне проекта
 
     npm run serve
 
+### Запуск mock сервиса для разработки
+
+В корне проекта файл Mock todo-api-gateway.postman_collection.json. Этот файл надо импортировать в postman и положить url mock сервиса дагнной коллеции в 
+.env.development в значение параметра VUE_APP_WEB_API_URL
+
 ## Запуск приложения в docker в PROD режиме
 
 Выполнить из корня проекта команду 'docker-compose -f "docker-compose.yml" up -d --build'
