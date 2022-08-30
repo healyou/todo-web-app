@@ -49,4 +49,4 @@ Dockerfile - Файл Dockerfile находится в корне проекта
 Выполнить из корня проекта команду 'docker-compose -f "docker-compose.yml" up -d --build'
 
 После запуска доступны следующие порты:
-localhost:8083 - адрес веб-приложения
+localhost:80 - адрес веб-приложения
